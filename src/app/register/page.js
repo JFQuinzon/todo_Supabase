@@ -9,6 +9,7 @@ export default function Home() {
             Todo<span className="text-emerald-500">App</span>
           </h1>
           <div className="mt-2 sm:mx-auto sm:w-full sm:max-w-sm">
+            <h1 className="card-title text-2xl justify-center">Signup</h1>
             <form className="space-y-6">
               <div>
                 <label
