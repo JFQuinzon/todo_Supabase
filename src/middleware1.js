@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 export function middleware(request) {
-    const user = true; 
+    const user = false; 
     const role = "admin"; 
 
     const url = request.nextUrl.clone(); 
