@@ -1,8 +1,11 @@
 "use client"
+import { supabase } from "../../../supabase/client";
 import Navbar from "./components/navbar";
 import { useEffect, useState } from "react";
 
 export default function Home() {
+  console.log(supabase)
+
   return (
     <div>
       <Navbar />

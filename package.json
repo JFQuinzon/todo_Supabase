@@ -9,12 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.4.0",
+    "@supabase/supabase-js": "^2.44.2",
+    "express": "^4.19.2",
     "flowbite": "^2.4.1",
     "next": "14.2.4",
     "react": "^18",
     "react-dom": "^18",
     "react-router": "^6.24.1",
-    "react-router-dom": "^6.24.1"
+    "react-router-dom": "^6.24.1",
+    "supabase": "^1.178.2"
   },
   "devDependencies": {
     "daisyui": "^4.12.10",
