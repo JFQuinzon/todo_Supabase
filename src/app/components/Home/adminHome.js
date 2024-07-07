@@ -9,6 +9,7 @@ import EditForm, { openModal } from '../Task/editForm';
 import { updateTaskAction } from '@/actions/tasks'; 
 
 export default function AdminHome() {
+
   const pageSize = 99; // Number of tasks per page
   const pageIncrement = 100; // Increment value for pagination
 
@@ -26,14 +27,14 @@ export default function AdminHome() {
   const handlePrevPage = () => {
     if (start > 0) {
       setStart(Math.max(0, start - pageIncrement));
-      setEnd(start - pageIncrement + pageSize); // Adjust end based on new start
+      setEnd(start - pageIncrement + pageSize);
     }
   };
 
   const handleNextPage = () => {
     if ((end + 1) < tasksLength) {
       setStart(start + pageIncrement);
-      setEnd(start + pageIncrement + pageSize); // Adjust end based on new start
+      setEnd(start + pageIncrement + pageSize); 
     }
   };
 
@@ -45,7 +46,7 @@ export default function AdminHome() {
   };
 
   const handleTaskUpdated = async () => {
-    await refetchTasks(); // Refetch tasks after update
+    await refetchTasks();
   };
 
   return (
