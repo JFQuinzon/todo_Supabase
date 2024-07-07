@@ -1,24 +1,24 @@
 "use client"
+import { loginAction } from "@/actions/users";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import { createAccountAction } from "@/actions/users";
 
-export default function Signup() {
+export default function Signin() {
   const router = useRouter();
 
   const [isPending, startTransition] = useTransition()
 
   const handleSubmit = (formData) => {
     startTransition(async () => {
-      const { errorMessage } = await createAccountAction(formData)
+      const { errorMessage } = await loginAction(formData)
 
       if (errorMessage) {
         toast.error(errorMessage)
       } else {
         router.push("/")
-        toast.success("Account Created")
+        toast.success("Successfully logged in ")
       }
     })
   };
@@ -32,26 +32,7 @@ export default function Signup() {
               Todo<span className="text-emerald-500">App</span>
             </h1>
             <div className="mt-2 sm:mx-auto sm:w-full sm:max-w-sm">
-              <h1 className="card-title text-2xl justify-center">Sign up</h1>
-              <form className="space-y-6" action={handleSubmit}><div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Display Name
-                </label>
-                <div className="mt-2">
-                  <input
-                    disabled={isPending}
-                    id="name"
-                    name="name"
-                    type="text"
-                    required
-                    autoComplete="name"
-                    className="text-center block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
+              <form className="space-y-6" action={handleSubmit}>
                 <div>
                   <label
                     htmlFor="email"
@@ -93,51 +74,28 @@ export default function Signup() {
                     />
                   </div>
                 </div>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <label
-                      htmlFor="profile"
-                      className="block text-sm font-medium leading-6 text-gray-900"
-                    >
-                      Profile Picture
-                    </label>
-                  </div>
-                  <div className="mt-2">
-                    <input
-                      disabled={isPending}
-                      id="thumbnail"
-                      name="thumbnail"
-                      type="file"
-                      required
-                      autoComplete="thumbnail"
-                      className="text-center block w-full "
-                    />
-                  </div>
-                </div>
 
                 <div>
-                  {!isPending &&
-                    <button
-                      type="submit"
-                      className="flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white btn btn-primary"
-                    >
-                      Sign in
-                    </button>}
-                  {isPending &&
-                    <button
-                      type="submit"
-                      disabled
-                      className="flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white btn btn-primary"
-                    >
-                      Signing in...
-                    </button>}
+                  {isPending && <button
+                    disabled
+                    type="submit"
+                    className="flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white btn btn-primary"
+                  >
+                    Signing in...
+                  </button>}
+                  {!isPending && <button
+                    type="submit"
+                    className="flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white btn btn-primary"
+                  >
+                    Sign in
+                  </button>}
                 </div>
               </form>
 
               <p className="mt-10 text-center text-sm text-gray-500">
-                Already a member?{" "}
+                Not on TodoApp yet?{" "}
                 <span className="font-bold hover:text-accent transition-all">
-                  <Link href="/">Sign in</Link>
+                  <Link href="/signup">Sign up</Link>
                 </span>
               </p>
             </div>
@@ -145,5 +103,6 @@ export default function Signup() {
         </div>
       </div>
     </>
+
   );
 }

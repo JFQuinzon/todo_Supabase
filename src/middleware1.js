@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
+import { supabase } from "./app/supabase/client";
 
-export function middleware(request) {
-    const user = false; 
-    const role = "admin"; 
+export async function middleware(request) {
 
-    const url = request.nextUrl.clone(); 
+    const { data: { session }, } = await supabase.auth.getSession();
+    console.log(session)
+
+    const user = session;
+    const role = "admin";
+
+    const url = request.nextUrl.clone();
 
     if (!user) {
         if (url.pathname === '/' || url.pathname === '/signup') {

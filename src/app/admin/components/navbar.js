@@ -1,8 +1,6 @@
 
 import Link from "next/link";
 
-
-
 export default function Navbar() {
     return (
         <div className="navbar fixed bg-base-100 shadow-md shadow-base-300 px-20 z-50">
