@@ -17,9 +17,7 @@ export default async function Navbar() {
             </div>
             {user && (
                 <div className="flex-none">
-                    {role === "admin" && (
-                        <Link href="/admin/newtask" className="btn mr-5">New Task</Link>
-                    )}
+                    
                     <span className="text-xl">{displayName}</span>
                     <ul className="menu menu-horizontal px-1">
                         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
@@ -30,7 +28,7 @@ export default async function Navbar() {
                                 />
                             </div>
                         </div>
-                        <SignOutButton/>
+                        <SignOutButton />
                     </ul>
                 </div>
             )}

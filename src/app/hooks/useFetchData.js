@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { createSupabaseClient } from '../supabase/client';
 
 function useFetchPage(start, end) {
+    const [tasksLength, setTasksLength] = useState(0);
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -13,12 +14,18 @@ function useFetchPage(start, end) {
             .from('tasks')
             .select('*')
             .range(start, end)
-            .order('id', { ascending: true });
+            // .order('created_at', { ascending: false });
+            .order('id', { ascending: false });
 
+        let { data } = await supabase
+            .from('tasks')
+            .select('*')
+            
         if (error) {
             setError(error);
             setLoading(false);
         } else {
+            setTasksLength(data.length);
             setTasks(tasks);
             setLoading(false);
         }
@@ -32,7 +39,7 @@ function useFetchPage(start, end) {
         await fetchTasks(start, end);
     };
 
-    return { tasks, loading, error, refetch };
+    return { tasks, tasksLength, loading, error, refetch };
 }
 
 export default useFetchPage;

@@ -12,10 +12,10 @@ export default function Signup() {
 
   const handleSubmit = (formData) => {
     startTransition(async () => {
-      const { errorMessage } = await createAccountAction(formData)
+      const { error } = await createAccountAction(formData)
 
-      if (errorMessage) {
-        toast.error(errorMessage)
+      if (error) {
+        toast.error(error)
       } else {
         router.push("/")
         toast.success("Account Created")

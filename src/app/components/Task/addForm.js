@@ -1,82 +1,61 @@
-// EditForm.js
-
-import { updateTaskAction } from '@/actions/tasks';
-import React, { useState, useEffect, useTransition } from 'react';
+import { createTaskAction } from '@/actions/tasks';
+import React, { useState, useTransition } from 'react';
 import toast from 'react-hot-toast';
 
-export function editModal() {
-  document.getElementById('editModal').showModal();
+export function addModal() {
+  document.getElementById('addModal').showModal();
 }
 
-export default function EditForm({ task, onTaskUpdated }) {
+export default function AddForm({ onTaskUpdated }) {
+  const [isPending, startTransition] = useTransition();
 
-  const [newFormData, setNewFormData] = useState({
-    id: '',
-    title: '',
-    description: '',
-    status: '',
-    deadline: '',
-  });
+  // State for form inputs
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [status, setStatus] = useState('Not Started');
+  const [deadline, setDeadline] = useState('');
 
-  useEffect(() => {
-    if (task) {
-      setNewFormData({
-        id: task.id,
-        title: task.title,
-        description: task.description,
-        status: task.status,
-        deadline: task.deadline,
-      });
-    }
-  }, [task]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewFormData({
-      ...newFormData,
-      [name]: value,
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    startTransition(async () => {
+      const formData = { title, description, status, deadline };
+      const { error } = await createTaskAction(formData);
+      
+      if (error) {
+        toast.error(error);
+      } else {
+        if (onTaskUpdated) {
+          onTaskUpdated();
+          toast.success("Task Successfully Created.");
+          // Clear the form
+          setTitle('');
+          setDescription('');
+          setStatus('Not Started');
+          setDeadline('');
+        }
+      }
+      document.getElementById('closeAddModal').click();
     });
   };
 
   const handleClose = () => {
-    setNewFormData({
-      id: task?.id,
-      title: task?.title,
-      description: task?.description,
-      status: task?.status,
-      deadline: task?.deadline,
-    });
-  }
-
-  const [isPending, startTransition] = useTransition()
-
-  const handleSubmit = () => {
-    startTransition(async () => {
-      const { error } = await updateTaskAction(newFormData)
-
-      if (error) {
-        toast.error(error)
-        document.getElementById('closeModal').click();
-      } else {
-        if (onTaskUpdated) {
-          onTaskUpdated();
-          document.getElementById('closeModal').click();
-          toast.success("Task Successfully Updated.")
-        }
-      }
-    })
-  }
+    // Reset form if necessary
+    setTitle('');
+    setDescription('');
+    setStatus('Not Started');
+    setDeadline('');
+  };
 
   return (
     <>
-      <dialog id="editModal" className="modal">
+      <dialog id="addModal" className="modal">
         <div className="modal-box ">
           <div>
             <h1 className="card-title text-5xl justify-center font-bold">
-              Edit Task
+              Add Task
             </h1>
             <div className="mt-2 sm:mx-auto sm:w-full sm:max-w-sm">
-              <form className="space-y-6" action={handleSubmit}>
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 <div>
                   <label
                     htmlFor="title"
@@ -88,10 +67,10 @@ export default function EditForm({ task, onTaskUpdated }) {
                     <input
                       name="title"
                       type="text"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
                       required
                       autoComplete="title"
-                      value={newFormData.title}
-                      onChange={handleInputChange}
                       className="text-center block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
                   </div>
@@ -106,10 +85,10 @@ export default function EditForm({ task, onTaskUpdated }) {
                   <div className="mt-2">
                     <textarea
                       name="description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
                       required
                       autoComplete="description"
-                      value={newFormData.description}
-                      onChange={handleInputChange}
                       className="text-center block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       rows={4} // Adjust rows as needed
                     />
@@ -125,8 +104,8 @@ export default function EditForm({ task, onTaskUpdated }) {
                   <div className="mt-2">
                     <select
                       name="status"
-                      value={newFormData.status}
-                      onChange={handleInputChange}
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value)}
                       className="select select-bordered text-center block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     >
                       <option value="Not Started">Not Started</option>
@@ -146,39 +125,44 @@ export default function EditForm({ task, onTaskUpdated }) {
                     <input
                       name="deadline"
                       type="date"
+                      value={deadline}
+                      onChange={(e) => setDeadline(e.target.value)}
                       required
                       autoComplete="deadline"
-                      value={newFormData.deadline}
-                      onChange={handleInputChange}
                       className="text-center block w-full rounded-md border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
                   </div>
                 </div>
                 <div>
-                  {isPending &&
+                  {isPending ? (
                     <button
                       disabled
                       type="submit"
                       className="flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white btn btn-primary"
                     >
-                      Updating...
+                      Adding...
                     </button>
-                  }
-                  {!isPending &&
+                  ) : (
                     <button
                       type="submit"
                       className="flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white btn btn-primary"
                     >
-                      Update
+                      Add
                     </button>
-                  }
+                  )}
                 </div>
               </form>
             </div>
           </div>
           <div className="modal-action">
             <form method="dialog">
-              <button onClick={() => handleClose()} id='closeModal' className="btn">Close</button>
+              <button
+                id="closeAddModal"
+                onClick={() => handleClose()}
+                className="btn"
+              >
+                Close
+              </button>
             </form>
           </div>
         </div>

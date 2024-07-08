@@ -1,9 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import useFetchPage from "@/app/hooks/useFetchPage";
+import useFetchPage from "@/app/hooks/useFetchData";
 import useFormatDate from "@/app/hooks/useFormatDate";
-import useFetchTaskLength from "@/app/hooks/useFetchTaskLength";
 import Preloader from "../preloader";
 
 export default function UserHome() {
@@ -12,8 +11,7 @@ export default function UserHome() {
 
   const [start, setStart] = useState(0);
   const [end, setEnd] = useState(pageSize);
-  const { tasks, loading, error } = useFetchPage(start, end);
-  const { tasksLength } = useFetchTaskLength();
+  const { tasks, loading, tasksLength } = useFetchPage(start, end);
 
   useEffect(() => {
     if (tasksLength > 0) {
@@ -44,7 +42,7 @@ export default function UserHome() {
           <div>
             <div className="join font-bold">
               <button className="join-item btn btn-outline hover:bg-emerald-500 text-xl" onClick={handlePrevPage}>«</button>
-              <button className="join-item btn btn-outline hover:bg-emerald-500 text-xl">{start + 1} - {end >= tasksLength ? tasksLength : end + 1}</button>
+              <button className="join-item btn btn-outline hover:bg-emerald-500 text-xl">{start >= tasksLength ? tasksLength : start + 1} - {end >= tasksLength ? tasksLength : end + 1}</button>
               <button className="join-item btn btn-outline hover:bg-emerald-500 text-xl" onClick={handleNextPage}>»</button>
             </div>
             <h1 className="font-normal text-2xl text-right pt-2">

@@ -12,10 +12,10 @@ export default function SignInForm() {
 
     const handleSubmit = (formData) => {
         startTransition(async () => {
-            const { errorMessage } = await loginAction(formData)
+            const { error } = await loginAction(formData)
 
-            if (errorMessage) {
-                toast.error(errorMessage)
+            if (error) {
+                toast.error(error)
             } else {
                 router.push("/")
                 toast.success("Successfully logged in ")

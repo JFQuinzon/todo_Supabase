@@ -1,12 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react";
-import useFetchPage from "@/app/hooks/useFetchPage";
+import { useEffect, useState, useTransition } from "react";
+import useFetchPage from "@/app/hooks/useFetchData";
 import useFormatDate from "@/app/hooks/useFormatDate";
-import useFetchTaskLength from "@/app/hooks/useFetchTaskLength";
 import Preloader from "../preloader";
-import EditForm, { openModal } from '../Task/editForm';
-import { updateTaskAction } from '@/actions/tasks'; 
+import EditForm, { editModal } from '../Task/editForm';
+import AddForm, { addModal } from '../Task/addForm';
+import { deleteTaskAction } from '@/actions/tasks';
+import toast from 'react-hot-toast';
 
 export default function AdminHome() {
 
@@ -15,8 +16,7 @@ export default function AdminHome() {
 
   const [start, setStart] = useState(0);
   const [end, setEnd] = useState(pageSize);
-  const { tasks, loading, error, refetch: refetchTasks } = useFetchPage(start, end);
-  const { tasksLength } = useFetchTaskLength();
+  const { tasks, tasksLength, loading, refetch: refetchTasks } = useFetchPage(start, end);
 
   useEffect(() => {
     if (tasksLength > 0) {
@@ -34,7 +34,7 @@ export default function AdminHome() {
   const handleNextPage = () => {
     if ((end + 1) < tasksLength) {
       setStart(start + pageIncrement);
-      setEnd(start + pageIncrement + pageSize); 
+      setEnd(start + pageIncrement + pageSize);
     }
   };
 
@@ -42,7 +42,22 @@ export default function AdminHome() {
 
   const handleEditClick = (task) => {
     setCurrentTask(task);
-    openModal();
+    editModal();
+  };
+
+  const [isPending, startTransition] = useTransition()
+
+  const handleDeleteClick = (taskID) => {
+    startTransition(async () => {
+      const { error } = await deleteTaskAction(taskID)
+
+      if (error) {
+        toast.error(error)
+      } else {
+        handleTaskUpdated();
+        toast.success("Task Successfully Deleted.")
+      }
+    })
   };
 
   const handleTaskUpdated = async () => {
@@ -53,18 +68,22 @@ export default function AdminHome() {
     <>
       <EditForm
         task={currentTask}
-        onTaskUpdated={handleTaskUpdated} 
+        onTaskUpdated={handleTaskUpdated}
       />
+      <AddForm onTaskUpdated={handleTaskUpdated} />
       <div className="p-28 bg-slate-100 ">
         <div className="flex text-4xl justify-between align-center font-bold">
           <div>
             All Tasks
           </div>
           <div>
-            <div className="join font-bold">
-              <button className="join-item btn btn-outline hover:bg-emerald-500 text-xl" onClick={handlePrevPage}>«</button>
-              <button className="join-item btn btn-outline hover:bg-emerald-500 text-xl">{start + 1} - {end >= tasksLength ? tasksLength : end + 1}</button>
-              <button className="join-item btn btn-outline hover:bg-emerald-500 text-xl" onClick={handleNextPage}>»</button>
+            <div className="flex">
+              <button onClick={() => addModal()} className="btn hover:bg-emerald-500 mr-5">New Task</button>
+              <div className="join font-bold">
+                <button className="join-item btn btn-outline hover:bg-emerald-500 text-xl" onClick={handlePrevPage}>«</button>
+                <button className="join-item btn btn-outline hover:bg-emerald-500 text-xl">{start >= tasksLength ? tasksLength : start + 1} - {end >= tasksLength ? tasksLength : end + 1}</button>
+                <button className="join-item btn btn-outline hover:bg-emerald-500 text-xl" onClick={handleNextPage}>»</button>
+              </div>
             </div>
             <h1 className="font-normal text-2xl text-right pt-2">
               Total task: {tasksLength}
@@ -72,10 +91,10 @@ export default function AdminHome() {
           </div>
         </div>
 
-        {loading && <>
+        {(loading || isPending) && <>
           <Preloader />
         </>}
-        {!loading &&
+        {(!loading && !isPending) &&
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4 py-5">
             {tasks.map((item) => (
               <div key={item.id} className="card bg-base-100 w-100 shadow-xl ">
@@ -90,7 +109,7 @@ export default function AdminHome() {
                     <button onClick={() => handleEditClick(item)} className="btn mr-2">
                       Edit
                     </button>
-                    <button className="btn bg-red-200">
+                    <button onClick={() => handleDeleteClick(item.id)} className="btn bg-red-200">
                       Delete
                     </button>
                   </div>

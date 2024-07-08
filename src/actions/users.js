@@ -11,12 +11,11 @@ export async function createAccountAction(formData) {
         const displayName = formData.get("name");
 
         const supabase = createSupabaseClient();
-
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email,
             password
         });
-
+        console.log("signUpError", signUpError)
         if (signUpError) throw signUpError;
 
         let userId = signUpData.user.id;
@@ -28,6 +27,7 @@ export async function createAccountAction(formData) {
                 .upload(userId + "/" + uuidv4(), thumbnail);
 
             if (uploadError) throw uploadError;
+            console.log("uploadError", uploadError)
 
             photoUrl = uploadData.fullPath; // Use `path` instead of `fullPath` if needed
         }
@@ -36,7 +36,7 @@ export async function createAccountAction(formData) {
             id: userId,
             email,
             displayName,
-            role: "user",
+            role: "member",
             photoUrl,
         };
 
@@ -45,9 +45,11 @@ export async function createAccountAction(formData) {
             .insert(userData);
 
         if (insertError) throw insertError;
+        console.log("insertError", insertError)
 
-        return { errorMessage: null };
+        return { error: null };
     } catch (error) {
+        console.log("errorrrrr", error.message)
         return { error: error.message }; // Ensure the error is serializable
     }
 }
@@ -65,10 +67,11 @@ export async function loginAction(formData) {
         });
 
         if (error) throw error;
-
-        return { errorMessage: null };
+        
+        return { error: null };
     } catch (error) {
-        return { error: error.message }; // Ensure the error is serializable
+        console.log(error.message)
+        return { error: error.message };
     }
 }
 
@@ -81,7 +84,7 @@ export async function logoutAction() {
 
         if (error) throw error;
 
-        return { errorMessage: null };
+        return { error: null };
     } catch (error) {
         return { error: error.message }; // Ensure the error is serializable
     }
