@@ -1,8 +1,6 @@
 "use client"
-
 import { useEffect, useState } from "react";
 import useFetchPage from "@/app/hooks/useFetchData";
-import useFormatDate from "@/app/hooks/useFormatDate";
 import Preloader from "../preloader";
 
 export default function UserHome() {
@@ -32,6 +30,18 @@ export default function UserHome() {
       setEnd(start + pageIncrement + pageSize); // Adjust end based on new start
     }
   };
+
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const options = {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    };
+    return date.toLocaleDateString('en-US', options);
+  }
+
   return (
     <>
       <div className="p-28 bg-slate-100">
@@ -63,7 +73,7 @@ export default function UserHome() {
                   <h2 className="card-title text-emerald-500">{item.title}</h2>
                   <p className="text-slate-800">{item.description}</p>
                   <div className="pt-2 flex justify-between items-center">
-                    <span className="text-slate-600">Due by: {useFormatDate(item.deadline)}</span>
+                    <span className="text-slate-600">Due by: {formatDate(item.deadline)}</span>
                     <span className="text-slate-600 text-emerald-500">{item.status}</span>
                   </div>
                 </div>
